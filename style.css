@@ -1,0 +1,22 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    image-rendering: pixelated;
+}
+#gameWrapper {
+    max-width: fit-content;
+    margin-left: 50%;
+    transform: translate(-256px);
+    display: flex;
+}
+#game {
+    position: relative;
+    width: 512px;
+    height: 352px;
+    margin: auto;
+    margin-top: 16px;
+}
+#side {
+    width: 300px;
+}
