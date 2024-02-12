@@ -7,5 +7,6 @@ export class Tile {
         this.flagged = false;
         this.nearbyMines = 0;
         this.nearbyFlags = 0;
+        this.held = false;
     }
 }

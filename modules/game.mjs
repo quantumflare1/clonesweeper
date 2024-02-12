@@ -14,6 +14,7 @@ let time = 0;
 let phase = 0;
 let gameState = 0;
 let startTime;
+let clickedTile;
 
 function clearOpenField(x, y) {
     const q = new Queue();
@@ -31,7 +32,7 @@ function clearOpenField(x, y) {
     while (!q.isEmpty()) {
         const t = q.remove();
 
-        if (t.type === 0 && t.nearbyMines === 0) {
+        if (t.type === 0 && t.nearbyMines === 0 && t.nearbyFlags === 0) {
             bfsClearTile(t.col-1, t.row-1);
             bfsClearTile(t.col-1, t.row);
             bfsClearTile(t.col-1, t.row+1);
@@ -44,15 +45,19 @@ function clearOpenField(x, y) {
     }
 }
 
+function holdTile(x, y) {
+    if (Helper.isWithinBoard(y, x, BOARD_HEIGHT, BOARD_WIDTH)) board[y][x].held = true;
+}
+
 function clearTile(x, y) {
     if (Helper.isWithinBoard(y, x, BOARD_HEIGHT, BOARD_WIDTH)) {
         const pos = board[y][x];
         if (!pos.flagged && !pos.known) {            
                 pos.known = true;
+                pos.held = false;
                 clearedTiles++;
                 clearOpenField(x, y);
                 if (pos.type === 1) clickedMine = true;
-                console.log("fella");
         }
     }
 }
@@ -100,6 +105,31 @@ function generateBoard(avoidX, avoidY) {
     }
 }
 
+function getHold(e = new PointerEvent()) {
+    if (gameState !== 0) {
+        return;
+    }
+    const click = Helper.pixelToBoardCoords(e.offsetX, e.offsetY);
+
+    if (click.x < 0 || click.x >= BOARD_WIDTH) return;
+    if (click.y < 0 || click.y >= BOARD_HEIGHT) return;
+
+    clickedTile = board[click.y][click.x];
+
+    if (!clickedTile.flagged) {
+        if (e.button === 0) {
+            holdTile(click.x, click.y);
+        }
+        if (e.button === 2) {
+            if (clickedTile.known) {
+                Helper.forAdjacent((x, y) => {
+                    if (Helper.isWithinBoard(y, x, BOARD_HEIGHT, BOARD_WIDTH) && !board[y][x].flagged) holdTile(x, y);
+                }, click.x, click.y);
+            }
+        }
+    }
+}
+
 function getClick(e = new PointerEvent()) {
     if (gameState !== 0) {
         return;
@@ -109,17 +139,22 @@ function getClick(e = new PointerEvent()) {
     if (click.x < 0 || click.x >= BOARD_WIDTH) return;
     if (click.y < 0 || click.y >= BOARD_HEIGHT) return;
 
-    const clicked = board[click.y][click.x];
+    clickedTile.held = false;
+    Helper.forAdjacent((x, y) => {
+        if (Helper.isWithinBoard(y, x, BOARD_HEIGHT, BOARD_WIDTH) && board[y][x].held) board[y][x].held = false;
+    }, clickedTile.col, clickedTile.row);
 
-    if (e.button === 0 && !clicked.flagged) {
+    clickedTile = board[click.y][click.x];
+
+    if (e.button === 0 && !clickedTile.flagged) {
         if (phase === 0) {
             generateBoard(click.x, click.y);
             startGame();
         }
         clearTile(click.x, click.y);
     } else if (e.button === 2) {
-        if (!clicked.known) flagTile(clicked);
-        if (clicked.nearbyFlags === clicked.nearbyMines && clicked.known) {
+        if (!clickedTile.known) flagTile(clickedTile);
+        if (clickedTile.nearbyFlags === clickedTile.nearbyMines && clickedTile.known) {
             Helper.forAdjacent(clearTile, click.x, click.y);
         }
     }
@@ -135,6 +170,7 @@ function incrementTime(value) {
 
 function startGame() {
     phase = 1;
+    startTime = document.timeline.currentTime;
     dispatchEvent(new Event("game_start"));
 }
 
@@ -150,7 +186,6 @@ function init() {
     clearedTiles = 0;
     gameState = 0;
     clickedMine = null;
-    startTime = document.timeline.currentTime;
     console.log(BOARD_HEIGHT * BOARD_WIDTH - NUM_MINES);
 
     for (let i = 0; i < BOARD_HEIGHT; i++) {
@@ -162,4 +197,4 @@ function init() {
 }
 
 
-export { board, clearedTiles, clickedMine, gameState, flags, time, phase, startTime, clearOpenField, incrementTime, generateBoard, getClick, startGame, endGame, init };
+export { board, clearedTiles, clickedMine, gameState, flags, time, phase, startTime, clearOpenField, incrementTime, generateBoard, getHold, getClick, startGame, endGame, init };
