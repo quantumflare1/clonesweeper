@@ -46,7 +46,7 @@ function clearOpenField(x, y) {
 }
 
 function holdTile(x, y) {
-    if (Helper.isWithinBoard(y, x, BOARD_HEIGHT, BOARD_WIDTH)) board[y][x].held = true;
+    if (Helper.isWithinBoard(y, x, BOARD_HEIGHT, BOARD_WIDTH) && !board[y][x].flagged) board[y][x].held = true;
 }
 
 function clearTile(x, y) {
@@ -122,9 +122,7 @@ function getHold(e = new PointerEvent()) {
         }
         if (e.button === 2) {
             if (clickedTile.known) {
-                Helper.forAdjacent((x, y) => {
-                    if (Helper.isWithinBoard(y, x, BOARD_HEIGHT, BOARD_WIDTH) && !board[y][x].flagged) holdTile(x, y);
-                }, click.x, click.y);
+                Helper.forAdjacent(holdTile, click.x, click.y);
             }
         }
     }

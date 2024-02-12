@@ -68,9 +68,6 @@ function draw() {
 }
 
 function game(frameTime) {
-    // poll input every frame
-    
-
     if (Minesweeper.gameState === 0) {
         millis = Minesweeper.startTime ? frameTime - Minesweeper.startTime : 0;
         if (Minesweeper.time < 999 && Minesweeper.phase === 1) {
