@@ -36,25 +36,25 @@ function draw() {
             const curTile = Minesweeper.board[coords.y][coords.x];
 
             if (curTile.known) {
-                if (curTile.type === 1) {
-                    ctx.putImageData(sprites[22], j, i);
-                }
-                else ctx.putImageData(sprites[24 + curTile.nearbyMines], j, i);
+                ctx.putImageData(sprites[24 + curTile.number], j, i);
             }
             else if (curTile.held) {
                 ctx.putImageData(sprites[24], j, i);
             }
+            else if (curTile.locked) {
+                ctx.putImageData(sprites[39], j, i);
+            }
             else if (curTile.flagged) {
-                ctx.putImageData(sprites[20], j, i);
+                ctx.putImageData(sprites[35], j, i);
             }
             else {
-                ctx.putImageData(sprites[19], j, i);
+                ctx.putImageData(sprites[34], j, i);
             }
         }
     }
-    if (pressedFace) ctx.putImageData(sprites[35], 240, 26);
-    else ctx.putImageData(sprites[34], 240, 26);
-    ctx.putImageData(sprites[36], 245, 31);
+    if (pressedFace) ctx.putImageData(sprites[20], 240, 26);
+    else ctx.putImageData(sprites[19], 240, 26);
+    ctx.putImageData(sprites[21], 245, 31);
     
     ctx.putImageData(sprites[8], 23, 23);
     ctx.putImageData(sprites[readDigit(Minesweeper.flags, 3) + 9], 26, 26);
@@ -70,7 +70,7 @@ function draw() {
 function game(frameTime) {
     if (Minesweeper.gameState === 0) {
         millis = Minesweeper.startTime ? frameTime - Minesweeper.startTime : 0;
-        if (Minesweeper.time < 999 && Minesweeper.phase === 1) {
+        if (Minesweeper.time < 999 && Minesweeper.phase !== 0) {
             Minesweeper.incrementTime(Math.floor(millis / 1000));
         }
 
@@ -88,25 +88,28 @@ function endDraw() {
             const curTile = Minesweeper.board[coords.y][coords.x];
 
             if (curTile.known) {
-                if (curTile.type === 1) ctx.putImageData(sprites[22], j, i);
+                if (curTile.type === 1) ctx.putImageData(sprites[37], j, i);
                 else ctx.putImageData(sprites[24 + curTile.nearbyMines], j, i);
             }
             else if (curTile.flagged) {
-                if (curTile.type === 0) ctx.putImageData(sprites[23], j, i);
+                if (curTile.type === 0) ctx.putImageData(sprites[38], j, i);
                 
-                else ctx.putImageData(sprites[20], j, i);
+                else ctx.putImageData(sprites[35], j, i);
             }
             else if (curTile.type === 1) {
-                if (Minesweeper.gameState === 1) ctx.putImageData(sprites[20], j, i);
-                else ctx.putImageData(sprites[21], j, i);
+                if (Minesweeper.gameState === 1) ctx.putImageData(sprites[35], j, i);
+                else ctx.putImageData(sprites[36], j, i);
+            }
+            else {
+                ctx.putImageData(sprites[34], j, i);
             }
         }
     }
-    if (pressedFace) ctx.putImageData(sprites[35], 240, 26);
-    else ctx.putImageData(sprites[34], 240, 26);
-    if (Minesweeper.gameState === 0) ctx.putImageData(sprites[36], 245, 31);
-    else if (Minesweeper.gameState === 1) ctx.putImageData(sprites[37], 245, 31);
-    else ctx.putImageData(sprites[38], 245, 31);
+    if (pressedFace) ctx.putImageData(sprites[20], 240, 26);
+    else ctx.putImageData(sprites[19], 240, 26);
+    if (Minesweeper.gameState === 0) ctx.putImageData(sprites[21], 245, 31);
+    else if (Minesweeper.gameState === 1) ctx.putImageData(sprites[22], 245, 31);
+    else ctx.putImageData(sprites[23], 245, 31);
     
     ctx.putImageData(sprites[8], 23, 23);
     ctx.putImageData(sprites[readDigit(Minesweeper.flags, 3) + 9], 26, 26);
@@ -120,7 +123,6 @@ function endDraw() {
 }
 
 function initDraw() {
-    console.log(sprites[36]);
     for (let i = 0; i <= canvas.clientHeight - 16; i += 16) {
         for (let j = 0; j < canvas.clientWidth; j += 16) {
             if (i >= 16 && i <= 48 && j >= 16 && j < canvas.clientWidth - 16) {
@@ -185,7 +187,8 @@ function load() {
     addEventListener("game_start", () => {
         requestAnimationFrame(game);
     });
-    addEventListener("game_end", () => {
+    addEventListener("game_ninedeath", () => {
+        
     });
 }
 
