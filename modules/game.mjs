@@ -338,7 +338,7 @@ function getClick(e = new PointerEvent()) {
     }
     console.log(clearedTiles, phaseThresholds[phase]);
     if (clearedTiles >= phaseThresholds[phase]) {
-        enterPhase[`${phase+1}`]();
+        //enterPhase[`${phase+1}`]();
     }
 
     if (clearedTiles === BOARD_HEIGHT * BOARD_WIDTH - NUM_MINES)
