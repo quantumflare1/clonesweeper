@@ -1,4 +1,4 @@
-import sprFiles from "./data/sprites.json" assert { type: "json" };
+import sprFiles from "./data/sprites.json" with { type: "json" };
 import * as Minesweeper from "./modules/game.mjs";
 import * as Helper from "./modules/helper.mjs";
 
